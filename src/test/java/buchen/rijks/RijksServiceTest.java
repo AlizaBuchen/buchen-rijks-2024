@@ -2,6 +2,7 @@ package buchen.rijks;
 
 import com.andrewoid.ApiKey;
 import org.junit.jupiter.api.Test;
+
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 public class RijksServiceTest {
@@ -23,6 +24,7 @@ public class RijksServiceTest {
         assertNotNull(artObject.title);
         assertNotNull(artObject.longTitle);
         assertNotNull(artObject.webImage);
+        assertNotNull(artObject.webImage.url);
         assertNotNull(artObject.principalOrFirstMaker);
     }
 
@@ -43,6 +45,7 @@ public class RijksServiceTest {
         assertNotNull(artObject.title);
         assertNotNull(artObject.longTitle);
         assertNotNull(artObject.webImage);
+        assertNotNull(artObject.webImage.url);
         assertNotNull(artObject.principalOrFirstMaker);
     }
 
@@ -63,6 +66,7 @@ public class RijksServiceTest {
         assertNotNull(artObject.title);
         assertNotNull(artObject.longTitle);
         assertNotNull(artObject.webImage);
+        assertNotNull(artObject.webImage.url);
         assertNotNull(artObject.principalOrFirstMaker);
     }
 }
