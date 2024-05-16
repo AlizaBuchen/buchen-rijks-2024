@@ -14,9 +14,9 @@ public class RijksServiceTest {
         ApiKey apiKey = new ApiKey();
 
         // when
-         ArtObjects collection = service.page(
-                 apiKey.get(), 1
-         ).blockingGet();
+        ArtObjects collection = service.page(
+                apiKey.get(), 1
+        ).blockingGet();
 
         // then
         ArtObject artObject = collection.artObjects[0];
