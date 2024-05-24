@@ -81,7 +81,8 @@ public class RijksSearchFrame extends JFrame {
                         Image scaledImage = originalImage.getScaledInstance(200, -1, Image.SCALE_SMOOTH);
                         ImageIcon icon = new ImageIcon(scaledImage);
                         JLabel label = new JLabel(icon);
-                        label.setToolTipText("<html><b>Title:</b> " + title + "<br><b>Artist:</b> " + artist + "</html>");
+                        label.setToolTipText("<html><b>Title:</b> " + title + "<br><b>Artist:</b> "
+                                + artist + "</html>");
                         label.addMouseListener(new MouseAdapter() {
                             @Override
                             public void mouseClicked(MouseEvent e) {

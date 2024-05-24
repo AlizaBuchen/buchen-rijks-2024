@@ -5,7 +5,7 @@ import java.awt.*;
 
 public class ImageFrame extends JFrame {
     public ImageFrame(ImageIcon imageIcon, String title, String artist) {
-        setSize(800,600);
+        setSize(800, 600);
         setTitle(title + " by " + artist);
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 
