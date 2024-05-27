@@ -29,7 +29,7 @@ public class RijksSearchFrame extends JFrame {
 
         JButton prevButton = new JButton("Previous");
         JButton nextButton = new JButton("Next");
-        JButton searchButton = new JButton ("Search");
+        JButton searchButton = new JButton("Search");
 
         nextButton.addActionListener(e -> {
             page++;
@@ -68,15 +68,16 @@ public class RijksSearchFrame extends JFrame {
                         .observeOn(SwingSchedulers.edt())
                         .subscribe(this::handleResponse,
                                 Throwable::printStackTrace);
-           }
-            else {
+           } else {
                 service.page(apiKey.get(), page)
                         .subscribeOn(Schedulers.io())
                         .observeOn(SwingSchedulers.edt())
                         .subscribe(this::handleResponse,
-                                Throwable::printStackTrace);}
+                                Throwable::printStackTrace);
+            }
         });
     }
+
     private void handleResponse(ArtObjects collection) {
         imagePanel.removeAll();
 
