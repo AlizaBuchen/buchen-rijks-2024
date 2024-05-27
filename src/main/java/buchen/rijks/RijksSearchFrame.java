@@ -1,6 +1,8 @@
 package buchen.rijks;
 
 import com.andrewoid.ApiKey;
+import hu.akarnokd.rxjava3.swing.SwingSchedulers;
+import io.reactivex.rxjava3.schedulers.Schedulers;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
@@ -27,6 +29,7 @@ public class RijksSearchFrame extends JFrame {
 
         JButton prevButton = new JButton("Previous");
         JButton nextButton = new JButton("Next");
+        JButton searchButton = new JButton ("Search");
 
         nextButton.addActionListener(e -> {
             page++;
@@ -38,16 +41,15 @@ public class RijksSearchFrame extends JFrame {
                 update();
             }
         });
-        searchField.getDocument().addDocumentListener(
-                (SimpleDocumentListener) e -> {
-                    page = 0;
-                    update();
-                });
+        searchButton.addActionListener(e -> {
+            update();
+        });
 
         JPanel searchPanel = new JPanel(new BorderLayout());
         searchPanel.add(searchField, BorderLayout.CENTER);
         searchPanel.add(prevButton, BorderLayout.WEST);
         searchPanel.add(nextButton, BorderLayout.EAST);
+        searchPanel.add(searchButton, BorderLayout.AFTER_LAST_LINE);
 
         imagePanel = new JPanel(new GridLayout(0, 5));
         add(searchPanel, BorderLayout.NORTH);
@@ -60,43 +62,51 @@ public class RijksSearchFrame extends JFrame {
         SwingUtilities.invokeLater(() -> {
             ApiKey apiKey = new ApiKey();
 
-            ArtObjects collection;
             if (!searchField.getText().isEmpty()) {
-                collection = service.query(apiKey.get(), page, searchField.getText()).blockingGet();
-            } else {
-                collection = service.page(apiKey.get(), page).blockingGet();
-            }
-
-            imagePanel.removeAll();
-
-            ArtObject[] artObjects = collection.artObjects;
-            imagePanel.setLayout(new GridLayout(2, 5));
-
-            for (ArtObject artObject : artObjects) {
-                String imageUrl = artObject.webImage.url;
-                String title = artObject.title;
-                String artist = artObject.principalOrFirstMaker;
-                    try {
-                        BufferedImage originalImage = ImageIO.read(new URL(imageUrl));
-                        Image scaledImage = originalImage.getScaledInstance(200, -1, Image.SCALE_SMOOTH);
-                        ImageIcon icon = new ImageIcon(scaledImage);
-                        JLabel label = new JLabel(icon);
-                        label.setToolTipText("<html><b>Title:</b> " + title + "<br><b>Artist:</b> "
-                                + artist + "</html>");
-                        label.addMouseListener(new MouseAdapter() {
-                            @Override
-                            public void mouseClicked(MouseEvent e) {
-                                super.mouseClicked(e);
-                                new ImageFrame(icon, title, artist);
-                            }
-                        });
-                        imagePanel.add(label);
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-                }
-            imagePanel.revalidate();
+                service.query(apiKey.get(), page, searchField.getText())
+                        .subscribeOn(Schedulers.io())
+                        .observeOn(SwingSchedulers.edt())
+                        .subscribe(this::handleResponse,
+                                Throwable::printStackTrace);
+           }
+            else {
+                service.page(apiKey.get(), page)
+                        .subscribeOn(Schedulers.io())
+                        .observeOn(SwingSchedulers.edt())
+                        .subscribe(this::handleResponse,
+                                Throwable::printStackTrace);}
         });
+    }
+    private void handleResponse(ArtObjects collection) {
+        imagePanel.removeAll();
+
+        ArtObject[] artObjects = collection.artObjects;
+        imagePanel.setLayout(new GridLayout(2, 5));
+
+        for (ArtObject artObject : artObjects) {
+            String imageUrl = artObject.webImage.url;
+            String title = artObject.title;
+            String artist = artObject.principalOrFirstMaker;
+            try {
+                BufferedImage originalImage = ImageIO.read(new URL(imageUrl));
+                Image scaledImage = originalImage.getScaledInstance(200, -1, Image.SCALE_SMOOTH);
+                ImageIcon icon = new ImageIcon(scaledImage);
+                JLabel label = new JLabel(icon);
+                label.setToolTipText("<html><b>Title:</b> " + title + "<br><b>Artist:</b> "
+                        + artist + "</html>");
+                label.addMouseListener(new MouseAdapter() {
+                    @Override
+                    public void mouseClicked(MouseEvent e) {
+                        super.mouseClicked(e);
+                        new ImageFrame(icon, title, artist);
+                    }
+                });
+                imagePanel.add(label);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+        imagePanel.revalidate();
     }
 
 }
